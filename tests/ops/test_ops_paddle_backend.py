@@ -3,7 +3,7 @@ import paddle
 import unittest
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-os.environ["TL_BACKEND"] = "padddle"
+os.environ["TL_BACKEND"] = "paddle"
 import numpy as np
 
 from tensorlayerx.backend.ops.paddle_backend import *

@@ -342,7 +342,7 @@ class TestOneFlowBackend(CustomTestCase):
     def test_cos(self):
         a = flow.tensor([0.0, np.pi / 2, np.pi])
         b = cos(a)
-        self.assertTrue(np.allclose(b.numpy(), np.cos([0.0, np.pi / 2, np.pi])))
+        self.assertTrue(np.allclose(b.numpy(), np.cos(a.numpy())))
 
     def test_cosh(self):
         x = flow.tensor([0.0, 1.0, 2.0])
@@ -373,7 +373,7 @@ class TestOneFlowBackend(CustomTestCase):
         y = flow.tensor([1, 2, 4])
         result = equal(x, y)
         expected = np.equal([1, 2, 3], [1, 2, 4])
-        self.assertTrue(np.array_equal(result.numpy(), expected))
+        self.assertTrue(np.array_equal(result, expected))
 
     def test_exp(self):
         x = flow.tensor([1.0, 2.0, 3.0])
@@ -523,7 +523,7 @@ class TestOneFlowBackend(CustomTestCase):
     def test_sin(self):
         x = flow.tensor([0.0, np.pi / 2, np.pi])
         result = sin(x)
-        expected = np.sin([0.0, np.pi / 2, np.pi])
+        expected = np.sin(x.numpy())
         self.assertTrue(np.allclose(result.numpy(), expected))
 
     def test_sinh(self):
@@ -561,7 +561,7 @@ class TestOneFlowBackend(CustomTestCase):
     def test_tan(self):
         x = flow.tensor([0.0, np.pi / 4, np.pi / 2])
         result = tan(x)
-        expected = np.tan([0.0, np.pi / 4, np.pi / 2])
+        expected = np.tan(x.numpy())
         self.assertTrue(np.allclose(result.numpy(), expected))
 
     def test_tanh(self):
