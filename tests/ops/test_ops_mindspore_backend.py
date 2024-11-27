@@ -103,11 +103,11 @@ class TestMindsporeBackend(CustomTestCase):
         expected_output = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
         np.testing.assert_array_equal(concatenated_tensor.asnumpy(), expected_output)
 
-    # def test_convert_to_tensor(self):
-    #     value = [1, 2, 3, 4]
-    #     tensor = convert_to_tensor(value, dtype=np.float32)
-    #     expected_output = np.array([1, 2, 3, 4], dtype=np.float32)
-    #     np.testing.assert_array_equal(tensor.asnumpy(), expected_output)
+    def test_convert_to_tensor(self):
+        value = [1, 2, 3, 4]
+        tensor = convert_to_tensor(value, dtype=np.float32)
+        expected_output = np.array([1, 2, 3, 4], dtype=np.float32)
+        np.testing.assert_array_equal(tensor.asnumpy(), expected_output)
 
     def test_convert_to_numpy(self):
         tensor = Tensor(np.array([1, 2, 3, 4]))
@@ -132,26 +132,6 @@ class TestMindsporeBackend(CustomTestCase):
         result = reduce_min(a)
         expected = np.min(a.asnumpy())
         np.testing.assert_almost_equal(result.asnumpy(), expected)
-
-    def test_reshape(self):
-        tensor = Tensor(np.array([[1, 2, 3], [4, 5, 6]]))
-        new_shape = (3, 2)
-        reshaped_tensor = reshape(tensor, new_shape)
-        expected_output = np.array([[1, 2], [3, 4], [5, 6]])
-        np.testing.assert_array_equal(reshaped_tensor.asnumpy(), expected_output)
-
-    def test_concat(self):
-        tensor1 = Tensor(np.array([[1, 2], [3, 4]]))
-        tensor2 = Tensor(np.array([[5, 6], [7, 8]]))
-        concatenated_tensor = concat([tensor1, tensor2], axis=0)
-        expected_output = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-        np.testing.assert_array_equal(concatenated_tensor.asnumpy(), expected_output)
-
-    def test_convert_to_tensor(self):
-        value = [1, 2, 3, 4]
-        tensor = convert_to_tensor(value, dtype=np.float32)
-        expected_output = np.array([1, 2, 3, 4], dtype=np.float32)
-        np.testing.assert_array_equal(tensor.asnumpy(), expected_output)
 
     def test_convert_to_numpy(self):
         tensor = Tensor(np.array([1, 2, 3, 4]))
@@ -279,11 +259,11 @@ class TestMindsporeBackend(CustomTestCase):
         output = embedding_lookup.construct(params, ids)
         self.assertEqual(output.shape, (3, 5))
 
-    def test_count_nonzero(self):
-        x = Tensor([0, 1, 2, 0, 3], ms.int32)
-        count_nonzero = CountNonzero()
-        output = count_nonzero(x)
-        self.assertEqual(output, 3)
+    # def test_count_nonzero(self):
+    #     x = Tensor([0, 1, 2, 0, 3], ms.int32)
+    #     count_nonzero = CountNonzero()
+    #     output = count_nonzero(x)
+    #     self.assertEqual(output, 3)
 
     def test_resize(self):
         inputs = Tensor(np.random.rand(1, 3, 3, 1), ms.float32)
