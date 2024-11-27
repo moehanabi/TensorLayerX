@@ -235,16 +235,6 @@ class TestJittorBackend(CustomTestCase):
         expected = np.eye(depth)[a.numpy()]
         self.assertTrue(np.array_equal(result.numpy(), expected))
 
-
-class TestJittorBackend(unittest.TestCase):
-
-    def test_l2_normalize(self):
-        x = jt.array([[1.0, 2.0], [3.0, 4.0]])
-        l2_norm = L2Normalize(axis=1)
-        result = l2_norm(x)
-        expected = np.array([[0.4472136, 0.8944272], [0.6, 0.8]])
-        np.testing.assert_allclose(result.numpy(), expected, rtol=1e-6)
-
     def test_embedding_lookup(self):
         params = jt.array([[0.1, 0.2], [0.3, 0.4], [0.5, 0.6]])
         ids = jt.array([0, 2])
@@ -460,7 +450,7 @@ class TestJittorBackend(unittest.TestCase):
         expected = np.isnan(x.numpy())
         np.testing.assert_array_equal(result.numpy(), expected)
 
-    def test_l2_normalize_func(self):
+    def test_l2_normalize(self):
         x = jt.array([[1.0, 2.0], [3.0, 4.0]])
         result = l2_normalize(x, axis=1)
         expected = np.array([[0.4472136, 0.8944272], [0.6, 0.8]])
