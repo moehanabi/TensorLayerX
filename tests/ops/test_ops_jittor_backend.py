@@ -356,13 +356,13 @@ class TestJittorBackend(unittest.TestCase):
 
     def test_argmax(self):
         x = jt.array([[1, 2, 3], [4, 5, 6]])
-        result = argmax(x, axis=1)
+        result = argmax(x, axis=1)[0]
         expected = np.argmax(x.numpy(), axis=1)
         np.testing.assert_array_equal(result.numpy(), expected)
 
     def test_argmin(self):
         x = jt.array([[1, 2, 3], [4, 5, 6]])
-        result = argmin(x, axis=1)
+        result = argmin(x, axis=1)[0]
         expected = np.argmin(x.numpy(), axis=1)
         np.testing.assert_array_equal(result.numpy(), expected)
 
@@ -528,8 +528,8 @@ class TestJittorBackend(unittest.TestCase):
     def test_reciprocal(self):
         x = jt.array([1, 2, 3])
         result = reciprocal(x)
-        expected = np.reciprocal(x.numpy())
-        np.testing.assert_array_equal(result.numpy(), expected)
+        expected = 1 / (x.numpy())
+        self.assertTrue(np.allclose(result.numpy(), expected))
 
     def test_reduce_prod(self):
         x = jt.array([1, 2, 3])
@@ -698,7 +698,7 @@ class TestJittorBackend(unittest.TestCase):
 
     def test_argsort(self):
         x = jt.array([3, 1, 2])
-        result = argsort(x)
+        result = argsort(x)[0]
         expected = np.argsort(x.numpy())
         np.testing.assert_array_equal(result.numpy(), expected)
 
