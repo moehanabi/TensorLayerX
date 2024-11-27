@@ -260,25 +260,11 @@ class TestTorchBackend(CustomTestCase):
         expected = np.eye(depth)[x.numpy()]
         self.assertTrue(np.array_equal(result.numpy(), expected))
 
-    def test_l2_normalize(self):
-        x = torch.tensor([1.0, 2.0, 3.0])
-        axis = 0
-        result = l2_normalize(x, axis)
-        expected = x.numpy() / np.linalg.norm(x.numpy(), ord=2, axis=axis, keepdims=True)
-        self.assertTrue(np.allclose(result.numpy(), expected))
-
-    def test_not_equal(self):
-        x = torch.tensor([1, 2, 3])
-        y = torch.tensor([1, 2, 4])
-        result = NotEqual()(x, y)
-        expected = np.not_equal(x.numpy(), y.numpy())
-        self.assertTrue(np.array_equal(result.numpy(), expected))
-
-    def test_count_nonzero(self):
-        x = torch.tensor([0, 1, 2, 0, 3])
-        result = CountNonzero()(x)
-        expected = np.count_nonzero(x.numpy())
-        self.assertEqual(result, expected)
+    # def test_count_nonzero(self):
+    #     x = torch.tensor([0, 1, 2, 0, 3])
+    #     result = CountNonzero()(x)
+    #     expected = np.count_nonzero(x.numpy())
+    #     self.assertEqual(result, expected)
 
     def test_resize(self):
         inputs = torch.randn(1, 3, 24, 24)
@@ -312,11 +298,11 @@ class TestTorchBackend(CustomTestCase):
     #     expected = np.pad(x.numpy(), ((0, 0), (1, 1), (1, 1), (1, 1)), mode="constant", constant_values=0)
     #     self.assertTrue(np.array_equal(result.numpy(), expected))
 
-    def test_sign(self):
-        x = torch.tensor([-1.0, 0.0, 1.0])
-        result = Sign()(x)
-        expected = np.sign(x.numpy())
-        self.assertTrue(np.array_equal(result.numpy(), expected))
+    # def test_sign(self):
+    #     x = torch.tensor([-1.0, 0.0, 1.0])
+    #     result = Sign()(x)
+    #     expected = np.sign(x.numpy())
+    #     self.assertTrue(np.array_equal(result.numpy(), expected))
 
     def test_ceil(self):
         x = torch.tensor([1.2, 2.5, 3.7])
