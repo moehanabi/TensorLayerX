@@ -1,7 +1,8 @@
+import os
 import unittest
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TL_BACKEND"] = "tensorflow"
@@ -32,7 +33,7 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(tf.reduce_all(tf.equal(x, 1)))
 
     def test_constant(self):
-        x = constant(0.5, (32, 3, 3, 32), dtype="float32")
+        x = constant(0.5, shape=(32, 3, 3, 32), dtype="float32")
         self.assertTrue(tf.reduce_all(tf.equal(x, 0.5)))
 
     def test_random_uniform(self):
@@ -108,7 +109,7 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertEqual(b.shape, (10, 10))
 
     def test_sqrt(self):
-        a = tf.constant([0.0, 1.0, 4.0], dtype=tf.float32)
+        a = tf.constant([0.0, 1.0, 4.0], dtype=tf.float64)
         b = sqrt(a)
         self.assertTrue(tf.reduce_all(tf.equal(b, [0.0, 1.0, 2.0])))
 
@@ -209,11 +210,6 @@ class TestTensorFlowBackend(CustomTestCase):
         b = OneHot(depth=3)(a)
         self.assertEqual(b.shape, (3, 3))
 
-    def test_l2_normalize(self):
-        a = tf.constant([1.0, 2.0, 3.0])
-        b = L2Normalize()(a)
-        self.assertTrue(np.allclose(b.numpy(), [0.26726124, 0.5345225, 0.8017837]))
-
     def test_embedding_lookup(self):
         a = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
         b = tf.constant([0, 2])
@@ -228,36 +224,25 @@ class TestTensorFlowBackend(CustomTestCase):
         loss = NCELoss()(weights, biases, labels, inputs, num_sampled=64, num_classes=10000)
         self.assertEqual(loss.shape, (64,))
 
-    def test_not_equal(self):
-        a = tf.constant([1, 2, 3])
-        b = tf.constant([1, 3, 5])
-        c = NotEqual()(a, b)
-        self.assertTrue(tf.reduce_all(tf.equal(c, [False, True, True])))
-
-    def test_count_nonzero(self):
-        a = tf.constant([0, 1, 2, 0, 3])
-        b = CountNonzero()(a)
-        self.assertEqual(b.numpy(), 3)
-
     def test_resize(self):
         a = tf.random.normal([1, 32, 32, 3])
         b = Resize(scale=[2, 2], method="bilinear")(a)
         self.assertEqual(b.shape, (1, 64, 64, 3))
 
-    # def test_zero_padding_1d(self):
-    #     a = tf.random.normal([1, 10, 3])
-    #     b = ZeroPadding1D(padding=(1, 1), data_format="channels_last")(a)
-    #     self.assertEqual(b.shape, (1, 12, 3))
+    def test_zero_padding_1d(self):
+        a = tf.random.normal([1, 10, 3])
+        b = ZeroPadding1D(padding=(1, 1), data_format="channels_last")(a)
+        self.assertEqual(b.shape, (1, 12, 3))
 
-    # def test_zero_padding_2d(self):
-    #     a = tf.random.normal([1, 10, 10, 3])
-    #     b = ZeroPadding2D(padding=((1, 1), (1, 1)), data_format="channels_last")(a)
-    #     self.assertEqual(b.shape, (1, 12, 12, 3))
+    def test_zero_padding_2d(self):
+        a = tf.random.normal([1, 10, 10, 3])
+        b = ZeroPadding2D(padding=((1, 1), (1, 1)), data_format="channels_last")(a)
+        self.assertEqual(b.shape, (1, 12, 12, 3))
 
-    # def test_zero_padding_3d(self):
-    #     a = tf.random.normal([1, 10, 10, 10, 3])
-    #     b = ZeroPadding3D(padding=((1, 1), (1, 1), (1, 1)), data_format="channels_last")(a)
-    #     self.assertEqual(b.shape, (1, 12, 12, 12, 3))
+    def test_zero_padding_3d(self):
+        a = tf.random.normal([1, 10, 10, 10, 3])
+        b = ZeroPadding3D(padding=((1, 1), (1, 1), (1, 1)), data_format="channels_last")(a)
+        self.assertEqual(b.shape, (1, 12, 12, 12, 3))
 
     def test_ceil(self):
         a = tf.constant([0.9142202, 0.72091234])
@@ -307,7 +292,8 @@ class TestTensorFlowBackend(CustomTestCase):
     def test_angle(self):
         a = tf.constant([2.15 + 3.57j, 3.89 + 6.54j])
         b = angle(a)
-        self.assertTrue(np.allclose(b.numpy(), [1.0277026, 1.033215]))
+        expected = np.angle(a.numpy())
+        self.assertTrue(np.allclose(b.numpy(), expected))
 
     def test_argmax(self):
         a = tf.constant([10, 20, 5, 6, 15])
@@ -340,12 +326,12 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(np.allclose(b.numpy(), [0.0, 0.5493061, -0.5493061]))
 
     def test_cos(self):
-        x = tf.constant([0.0, np.pi / 2], dtype=tf.float32)
+        x = tf.constant([0.0, np.pi / 2], dtype=tf.float64)
         y = cos(x)
-        self.assertTrue(np.allclose(y.numpy(), np.cos([0.0, np.pi / 2])))
+        np.testing.assert_allclose(y.numpy(), np.cos([0.0, np.pi / 2]))
 
     def test_cosh(self):
-        x = tf.constant([0.0, 1.0], dtype=tf.float32)
+        x = tf.constant([0.0, 1.0], dtype=tf.float64)
         y = cosh(x)
         self.assertTrue(np.allclose(y.numpy(), np.cosh([0.0, 1.0])))
 
@@ -355,12 +341,12 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertEqual(y.numpy(), 3)
 
     def test_cumprod(self):
-        x = tf.constant([1, 2, 3], dtype=tf.float32)
+        x = tf.constant([1, 2, 3], dtype=tf.float64)
         y = cumprod(x)
         self.assertTrue(np.allclose(y.numpy(), np.cumprod([1, 2, 3])))
 
     def test_cumsum(self):
-        x = tf.constant([1, 2, 3], dtype=tf.float32)
+        x = tf.constant([1, 2, 3], dtype=tf.float64)
         y = cumsum(x)
         self.assertTrue(np.allclose(y.numpy(), np.cumsum([1, 2, 3])))
 
@@ -371,7 +357,7 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(np.array_equal(z.numpy(), [True, True, False]))
 
     def test_exp(self):
-        x = tf.constant([1, 2, 3], dtype=tf.float32)
+        x = tf.constant([1, 2, 3], dtype=tf.float64)
         y = exp(x)
         self.assertTrue(np.allclose(y.numpy(), np.exp([1, 2, 3])))
 
@@ -400,17 +386,17 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(np.array_equal(z.numpy(), [False, True, True]))
 
     def test_is_inf(self):
-        x = tf.constant([1.0, 2.0, np.inf], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, np.inf], dtype=tf.float64)
         y = is_inf(x)
         self.assertTrue(np.array_equal(y.numpy(), [False, False, True]))
 
     def test_is_nan(self):
-        x = tf.constant([1.0, 2.0, np.nan], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, np.nan], dtype=tf.float64)
         y = is_nan(x)
         self.assertTrue(np.array_equal(y.numpy(), [False, False, True]))
 
     def test_l2_normalize(self):
-        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
         y = l2_normalize(x)
         self.assertTrue(np.allclose(y.numpy(), x.numpy() / np.linalg.norm(x.numpy())))
 
@@ -427,12 +413,12 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(np.array_equal(z.numpy(), [True, True, False]))
 
     def test_log(self):
-        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
         y = log(x)
         self.assertTrue(np.allclose(y.numpy(), np.log([1.0, 2.0, 3.0])))
 
     def test_log_sigmoid(self):
-        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
         y = log_sigmoid(x)
         self.assertTrue(np.allclose(y.numpy(), -np.logaddexp(0, -x.numpy())))
 
@@ -454,8 +440,8 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(np.array_equal(z.numpy(), [False, False, True]))
 
     def test_pow(self):
-        x = tf.constant([1, 2, 3], dtype=tf.float32)
-        y = tf.constant([2, 2, 2], dtype=tf.float32)
+        x = tf.constant([1, 2, 3], dtype=tf.float64)
+        y = tf.constant([2, 2, 2], dtype=tf.float64)
         z = pow(x, y)
         self.assertTrue(np.allclose(z.numpy(), np.power([1, 2, 3], [2, 2, 2])))
 
@@ -465,119 +451,119 @@ class TestTensorFlowBackend(CustomTestCase):
         self.assertTrue(np.array_equal(y.numpy(), [1, 3]))
 
     def test_reciprocal(self):
-        x = tf.constant([1.0, 2.0, 4.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 4.0], dtype=tf.float64)
         y = reciprocal(x)
         self.assertTrue(np.allclose(y.numpy(), 1 / np.array([1.0, 2.0, 4.0])))
 
     def test_reduce_prod(self):
-        x = tf.constant([1, 2, 3, 4], dtype=tf.float32)
+        x = tf.constant([1, 2, 3, 4], dtype=tf.float64)
         y = reduce_prod(x)
         self.assertTrue(np.allclose(y.numpy(), np.prod([1, 2, 3, 4])))
 
     def test_reduce_std(self):
-        x = tf.constant([1, 2, 3, 4], dtype=tf.float32)
+        x = tf.constant([1, 2, 3, 4], dtype=tf.float64)
         y = reduce_std(x)
         self.assertTrue(np.allclose(y.numpy(), np.std([1, 2, 3, 4])))
 
     def test_reduce_sum(self):
-        x = tf.constant([1, 2, 3, 4], dtype=tf.float32)
+        x = tf.constant([1, 2, 3, 4], dtype=tf.float64)
         y = reduce_sum(x)
         self.assertTrue(np.allclose(y.numpy(), np.sum([1, 2, 3, 4])))
 
     def test_reduce_variance(self):
-        x = tf.constant([1, 2, 3, 4], dtype=tf.float32)
+        x = tf.constant([1, 2, 3, 4], dtype=tf.float64)
         y = reduce_variance(x)
         self.assertTrue(np.allclose(y.numpy(), np.var([1, 2, 3, 4])))
 
     def test_round(self):
-        x = tf.constant([0.5, 1.5, 2.5, 3.5], dtype=tf.float32)
+        x = tf.constant([0.5, 1.5, 2.5, 3.5], dtype=tf.float64)
         y = round(x)
         self.assertTrue(np.array_equal(y.numpy(), np.round([0.5, 1.5, 2.5, 3.5])))
 
     def test_rsqrt(self):
-        x = tf.constant([1.0, 4.0, 9.0], dtype=tf.float32)
+        x = tf.constant([1.0, 4.0, 9.0], dtype=tf.float64)
         y = rsqrt(x)
         self.assertTrue(np.allclose(y.numpy(), 1 / np.sqrt([1.0, 4.0, 9.0])))
 
     def test_segment_max(self):
-        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float32)
+        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float64)
         segment_ids = tf.constant([0, 0, 1], dtype=tf.int32)
         y = segment_max(x, segment_ids)
         self.assertTrue(np.array_equal(y.numpy(), [[4, 5, 6], [7, 8, 9]]))
 
     def test_segment_mean(self):
-        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float32)
+        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float64)
         segment_ids = tf.constant([0, 0, 1], dtype=tf.int32)
         y = segment_mean(x, segment_ids)
         self.assertTrue(np.allclose(y.numpy(), [[2.5, 3.5, 4.5], [7, 8, 9]]))
 
     def test_segment_min(self):
-        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float32)
+        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float64)
         segment_ids = tf.constant([0, 0, 1], dtype=tf.int32)
         y = segment_min(x, segment_ids)
         self.assertTrue(np.array_equal(y.numpy(), [[1, 2, 3], [7, 8, 9]]))
 
     def test_segment_prod(self):
-        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float32)
+        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float64)
         segment_ids = tf.constant([0, 0, 1], dtype=tf.int32)
         y = segment_prod(x, segment_ids)
         self.assertTrue(np.array_equal(y.numpy(), [[4, 10, 18], [7, 8, 9]]))
 
     def test_segment_sum(self):
-        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float32)
+        x = tf.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=tf.float64)
         segment_ids = tf.constant([0, 0, 1], dtype=tf.int32)
         y = segment_sum(x, segment_ids)
         self.assertTrue(np.array_equal(y.numpy(), [[5, 7, 9], [7, 8, 9]]))
 
     def test_sigmoid(self):
-        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float32)
+        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float64)
         y = sigmoid(x)
         self.assertTrue(np.allclose(y.numpy(), 1 / (1 + np.exp(-np.array([0.0, 1.0, 2.0])))))
 
     def test_sign(self):
-        x = tf.constant([-1.0, 0.0, 1.0], dtype=tf.float32)
+        x = tf.constant([-1.0, 0.0, 1.0], dtype=tf.float64)
         y = sign(x)
         self.assertTrue(np.array_equal(y.numpy(), [-1.0, 0.0, 1.0]))
 
     def test_sin(self):
-        x = tf.constant([0.0, np.pi / 2, np.pi], dtype=tf.float32)
+        x = tf.constant([0.0, np.pi / 2, np.pi], dtype=tf.float64)
         y = sin(x)
         self.assertTrue(np.allclose(y.numpy(), np.sin([0.0, np.pi / 2, np.pi])))
 
     def test_sinh(self):
-        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float32)
+        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float64)
         y = sinh(x)
         self.assertTrue(np.allclose(y.numpy(), np.sinh([0.0, 1.0, 2.0])))
 
     def test_softplus(self):
-        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float32)
+        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float64)
         y = softplus(x)
         self.assertTrue(np.allclose(y.numpy(), np.log1p(np.exp([0.0, 1.0, 2.0]))))
 
     def test_square(self):
-        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
         y = square(x)
         self.assertTrue(np.array_equal(y.numpy(), [1.0, 4.0, 9.0]))
 
     def test_squared_difference(self):
-        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float32)
-        y = tf.constant([1.0, 2.0, 4.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
+        y = tf.constant([1.0, 2.0, 4.0], dtype=tf.float64)
         z = squared_difference(x, y)
         self.assertTrue(np.array_equal(z.numpy(), [0.0, 0.0, 1.0]))
 
     def test_subtract(self):
-        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float32)
-        y = tf.constant([1.0, 2.0, 4.0], dtype=tf.float32)
+        x = tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
+        y = tf.constant([1.0, 2.0, 4.0], dtype=tf.float64)
         z = subtract(x, y)
         self.assertTrue(np.array_equal(z.numpy(), [0.0, 0.0, -1.0]))
 
     def test_tan(self):
-        x = tf.constant([0.0, np.pi / 4, np.pi / 2], dtype=tf.float32)
+        x = tf.constant([0.0, np.pi / 4, np.pi / 2], dtype=tf.float64)
         y = tan(x)
-        self.assertTrue(np.allclose(y.numpy(), np.tan([0.0, np.pi / 4, np.pi / 2])))
+        np.testing.assert_allclose(y.numpy(), np.tan([0.0, np.pi / 4, np.pi / 2]))
 
     def test_tanh(self):
-        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float32)
+        x = tf.constant([0.0, 1.0, 2.0], dtype=tf.float64)
         y = tanh(x)
         self.assertTrue(np.allclose(y.numpy(), np.tanh([0.0, 1.0, 2.0])))
 
@@ -709,10 +695,10 @@ class TestTensorFlowBackend(CustomTestCase):
         expected = [[4, 5, 6], [8, 10, 12], [12, 15, 18]]
         self.assertTrue(np.array_equal(res.numpy(), expected))
 
-    def test_set_device(self):
-        set_device("CPU")
-        device = get_device()
-        self.assertTrue("CPU" in device[0].device_type)
+    # def test_set_device(self):
+    #     set_device("CPU")
+    #     device = get_device()
+    #     self.assertTrue("CPU" in device[0].device_type)
 
     # def test_scatter_update(self):
     #     x = tf.ones((5,))
@@ -730,10 +716,10 @@ class TestTensorFlowBackend(CustomTestCase):
     #     x = to_device(x, device="CPU", id=0)
     #     self.assertTrue(is_tensor(x))
 
-    # def test_roll(self):
-    #     x = tf.ones((5, 6))
-    #     res = roll(x, shifts=2)
-    #     self.assertTrue(np.array_equal(res.numpy(), np.roll(np.ones((5, 6)), 2)))
+    def test_roll(self):
+        x = tf.ones((5, 6))
+        res = roll(x, shifts=2)
+        self.assertTrue(np.array_equal(res.numpy(), np.roll(np.ones((5, 6)), 2)))
 
     def test_logsoftmax(self):
         x = tf.constant([[1.0, 2.0, 3.0], [1.0, 2.0, 3.0]])

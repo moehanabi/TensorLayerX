@@ -1,7 +1,8 @@
+import os
 import unittest
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TL_BACKEND"] = "tensorflow"
