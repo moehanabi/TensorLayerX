@@ -274,35 +274,35 @@ class TestTorchBackend(CustomTestCase):
         output = resize(inputs, output_size, method, antialias)
         self.assertEqual(output.shape, (1, 3, 48, 48))
 
-    # def test_zero_padding_1d(self):
-    #     x = torch.tensor([[1, 2, 3], [4, 5, 6]])
-    #     padding = (1, 1)
-    #     data_format = "channels_last"
-    #     result = ZeroPadding1D(padding, data_format)(x)
-    #     expected = np.pad(x.numpy(), ((0, 0), (1, 1)), mode="constant", constant_values=0)
-    #     self.assertTrue(np.array_equal(result.numpy(), expected))
+    def test_zero_padding_1d(self):
+        x = torch.tensor([[1, 2, 3], [4, 5, 6]])
+        padding = (1, 1)
+        data_format = "channels_last"
+        result = ZeroPadding1D(padding, data_format)(x)
+        expected = np.pad(x.numpy(), ((0, 0), (1, 1)), mode="constant", constant_values=0)
+        self.assertTrue(np.array_equal(result.numpy(), expected))
 
-    # def test_zero_padding_2d(self):
-    #     x = torch.tensor([[1, 2], [3, 4]])
-    #     padding = ((1, 1), (2, 2))
-    #     data_format = "channels_last"
-    #     result = ZeroPadding2D(padding, data_format)(x)
-    #     expected = np.pad(x.numpy(), ((1, 1), (2, 2)), mode="constant", constant_values=0)
-    #     self.assertTrue(np.array_equal(result.numpy(), expected))
+    def test_zero_padding_2d(self):
+        x = torch.tensor([[1, 2], [3, 4]])
+        padding = ((1, 1), (2, 2))
+        data_format = "channels_last"
+        result = ZeroPadding2D(padding, data_format)(x)
+        expected = np.pad(x.numpy(), ((1, 1), (2, 2)), mode="constant", constant_values=0)
+        self.assertTrue(np.array_equal(result.numpy(), expected))
 
-    # def test_zero_padding_3d(self):
-    #     x = torch.randn(1, 1, 2, 2, 2)
-    #     padding = ((1, 1), (1, 1), (1, 1))
-    #     data_format = "channels_last"
-    #     result = ZeroPadding3D(padding, data_format)(x)
-    #     expected = np.pad(x.numpy(), ((0, 0), (1, 1), (1, 1), (1, 1)), mode="constant", constant_values=0)
-    #     self.assertTrue(np.array_equal(result.numpy(), expected))
+    def test_zero_padding_3d(self):
+        x = torch.randn(1, 1, 2, 2, 2)
+        padding = ((1, 1), (1, 1), (1, 1))
+        data_format = "channels_last"
+        result = ZeroPadding3D(padding, data_format)(x)
+        expected = np.pad(x.numpy(), ((0, 0), (1, 1), (1, 1), (1, 1)), mode="constant", constant_values=0)
+        self.assertTrue(np.array_equal(result.numpy(), expected))
 
-    # def test_sign(self):
-    #     x = torch.tensor([-1.0, 0.0, 1.0])
-    #     result = Sign()(x)
-    #     expected = np.sign(x.numpy())
-    #     self.assertTrue(np.array_equal(result.numpy(), expected))
+    def test_sign(self):
+        x = torch.tensor([-1.0, 0.0, 1.0])
+        result = Sign()(x)
+        expected = np.sign(x.numpy())
+        self.assertTrue(np.array_equal(result.numpy(), expected))
 
     def test_ceil(self):
         x = torch.tensor([1.2, 2.5, 3.7])
@@ -836,11 +836,11 @@ class TestTorchBackend(CustomTestCase):
     #     expected = torch.tensor([9, 2, 10, 4, 5])
     #     self.assertTrue(torch.equal(result, expected))
 
-    # def test_roll(self):
-    #     x = torch.tensor([1, 2, 3, 4, 5])
-    #     result = roll(x, shifts=2)
-    #     expected = np.roll(x.numpy(), shifts=2)
-    #     self.assertTrue(np.array_equal(result.numpy(), expected))
+    def test_roll(self):
+        x = torch.tensor([1, 2, 3, 4, 5])
+        result = roll(x, shifts=2)
+        expected = np.roll(x.numpy(), shifts=2)
+        self.assertTrue(np.array_equal(result.numpy(), expected))
 
     def test_logsoftmax(self):
         x = torch.tensor([1.0, 2.0, 3.0])
