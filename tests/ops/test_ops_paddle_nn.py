@@ -5,8 +5,11 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TL_BACKEND"] = "paddle"
 import numpy as np
 
+from tensorlayerx.backend.ops.paddle_backend import *
 from tensorlayerx.backend.ops.paddle_nn import *
 from tests.utils import CustomTestCase
+
+set_device("CPU", 0)
 
 
 class TestPaddleNN(CustomTestCase):
@@ -47,12 +50,12 @@ class TestPaddleNN(CustomTestCase):
 
     def test_nchw_to_nhwc(self):
         x = pd.to_tensor(np.random.rand(2, 3, 4, 5), dtype="float32")
-        expected_shape = (2, 4, 5, 3)
+        expected_shape = [2, 4, 5, 3]
         self.assertEqual(nchw_to_nhwc(x).shape, expected_shape)
 
     def test_nhwc_to_nchw(self):
         x = pd.to_tensor(np.random.rand(2, 4, 5, 3), dtype="float32")
-        expected_shape = (2, 3, 4, 5)
+        expected_shape = [2, 3, 4, 5]
         self.assertEqual(nhwc_to_nchw(x).shape, expected_shape)
 
     def test_relu(self):
@@ -99,9 +102,9 @@ class TestPaddleNN(CustomTestCase):
         self.assertTrue(np.allclose(softmax(pd.to_tensor(x)).numpy(), expected))
 
     def test_gelu(self):
-        x = np.random.rand(2, 3).astype("float32")
-        expected = 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * np.power(x, 3))))
-        self.assertTrue(np.allclose(gelu(pd.to_tensor(x)).numpy(), expected))
+        x = np.array([-1, 0, 1])
+        expected = np.array([-0.1588, 0, 0.8413])
+        np.testing.assert_allclose(gelu(pd.to_tensor(x)).numpy(), expected)
 
     def test_dropout(self):
         x = np.random.rand(2, 3).astype("float32")
@@ -120,45 +123,45 @@ class TestPaddleNN(CustomTestCase):
         x = np.random.rand(2, 3, 4).astype("float32")
         filters = np.random.rand(3, 3, 3).astype("float32")
         # Expected shape calculation
-        expected_shape = (2, 3, 4)
+        expected_shape = [2, 3, 4]
         self.assertEqual(conv1d(pd.to_tensor(x), pd.to_tensor(filters), 1, "SAME").shape, expected_shape)
 
     def test_conv2d(self):
-        expected_shape = (2, 3, 4, 3)
+        expected_shape = [2, 3, 4, 3]
         self.assertEqual(conv2d(self.x, self.filters, [1, 1, 1, 1], "SAME").shape, expected_shape)
 
     def test_conv3d(self):
         x = np.random.rand(2, 3, 4, 5, 6).astype("float32")
         filters = np.random.rand(3, 3, 3, 3, 3).astype("float32")
-        expected_shape = (2, 3, 4, 5, 3)
+        expected_shape = [2, 3, 4, 5, 3]
         self.assertEqual(conv3d(pd.to_tensor(x), pd.to_tensor(filters), [1, 1, 1, 1, 1], "SAME").shape, expected_shape)
 
     def test_max_pool1d(self):
         x = np.random.rand(2, 3, 4).astype("float32")
-        expected_shape = (2, 3, 2)
+        expected_shape = [2, 3, 2]
         self.assertEqual(max_pool1d(pd.to_tensor(x), 2).shape, expected_shape)
 
     def test_max_pool2d(self):
-        expected_shape = (2, 3, 2, 2)
+        expected_shape = [2, 3, 2, 2]
         self.assertEqual(max_pool2d(self.x, 2).shape, expected_shape)
 
     def test_max_pool3d(self):
         x = np.random.rand(2, 3, 4, 5, 6).astype("float32")
-        expected_shape = (2, 3, 2, 2, 3)
+        expected_shape = [2, 3, 2, 2, 3]
         self.assertEqual(max_pool3d(pd.to_tensor(x), 2).shape, expected_shape)
 
     def test_avg_pool1d(self):
         x = np.random.rand(2, 3, 4).astype("float32")
-        expected_shape = (2, 3, 2)
+        expected_shape = [2, 3, 2]
         self.assertEqual(avg_pool1d(pd.to_tensor(x), 2).shape, expected_shape)
 
     def test_avg_pool2d(self):
-        expected_shape = (2, 3, 2, 2)
+        expected_shape = [2, 3, 2, 2]
         self.assertEqual(avg_pool2d(self.x, 2).shape, expected_shape)
 
     def test_avg_pool3d(self):
         x = np.random.rand(2, 3, 4, 5, 6).astype("float32")
-        expected_shape = (2, 3, 2, 2, 3)
+        expected_shape = [2, 3, 2, 2, 3]
         self.assertEqual(avg_pool3d(pd.to_tensor(x), 2).shape, expected_shape)
 
     def test_depthwise_conv2d(self):
@@ -202,7 +205,7 @@ class TestPaddleNN(CustomTestCase):
     def test_group_conv2d(self):
         x = np.random.rand(2, 3, 4, 6).astype("float32")
         filters = np.random.rand(3, 3, 3, 6).astype("float32")
-        expected_shape = (2, 3, 4, 6)
+        expected_shape = [2, 3, 4, 6]
         group_conv = GroupConv2D(strides=[1, 1, 1, 1], padding="SAME", data_format="NHWC", dilations=[1, 1, 1, 1], out_channel=6, k_size=[3, 3], groups=3)
         self.assertEqual(group_conv(pd.to_tensor(x), pd.to_tensor(filters)).shape, expected_shape)
 
@@ -210,7 +213,7 @@ class TestPaddleNN(CustomTestCase):
         x = np.random.rand(2, 3, 4).astype("float32")
         depthwise_filters = np.random.rand(3, 3, 1).astype("float32")
         pointwise_filters = np.random.rand(1, 3, 3).astype("float32")
-        expected_shape = (2, 3, 4)
+        expected_shape = [2, 3, 4]
         separable_conv = SeparableConv1D(stride=1, padding="SAME", data_format="NWC", dilations=1, out_channel=3, k_size=3, in_channel=3, depth_multiplier=1)
         self.assertEqual(separable_conv(pd.to_tensor(x), pd.to_tensor(depthwise_filters), pd.to_tensor(pointwise_filters)).shape, expected_shape)
 
@@ -218,36 +221,36 @@ class TestPaddleNN(CustomTestCase):
         x = np.random.rand(2, 3, 4, 5).astype("float32")
         depthwise_filters = np.random.rand(3, 3, 5, 1).astype("float32")
         pointwise_filters = np.random.rand(1, 1, 5, 5).astype("float32")
-        expected_shape = (2, 3, 4, 5)
+        expected_shape = [2, 3, 4, 5]
         separable_conv = SeparableConv2D(strides=[1, 1, 1, 1], padding="SAME", data_format="NHWC", dilations=[1, 1, 1, 1], out_channel=5, k_size=[3, 3], in_channel=5, depth_multiplier=1)
         self.assertEqual(separable_conv(pd.to_tensor(x), pd.to_tensor(depthwise_filters), pd.to_tensor(pointwise_filters)).shape, expected_shape)
 
     def test_adaptive_avg_pool1d(self):
         x = np.random.rand(2, 3, 4).astype("float32")
-        expected_shape = (2, 3, 2)
+        expected_shape = [2, 3, 2]
         self.assertEqual(adaptive_avg_pool1d(pd.to_tensor(x), 2).shape, expected_shape)
 
     def test_adaptive_avg_pool2d(self):
-        expected_shape = (2, 3, 2, 2)
+        expected_shape = [2, 3, 2, 2]
         self.assertEqual(adaptive_avg_pool2d(self.x, [2, 2]).shape, expected_shape)
 
     def test_adaptive_avg_pool3d(self):
         x = np.random.rand(2, 3, 4, 5, 6).astype("float32")
-        expected_shape = (2, 3, 2, 2, 2)
+        expected_shape = [2, 3, 2, 2, 2]
         self.assertEqual(adaptive_avg_pool3d(pd.to_tensor(x), [2, 2, 2]).shape, expected_shape)
 
     def test_adaptive_max_pool1d(self):
         x = np.random.rand(2, 3, 4).astype("float32")
-        expected_shape = (2, 3, 2)
+        expected_shape = [2, 3, 2]
         self.assertEqual(adaptive_max_pool1d(pd.to_tensor(x), 2).shape, expected_shape)
 
     def test_adaptive_max_pool2d(self):
-        expected_shape = (2, 3, 2, 2)
+        expected_shape = [2, 3, 2, 2]
         self.assertEqual(adaptive_max_pool2d(self.x, [2, 2]).shape, expected_shape)
 
     def test_adaptive_max_pool3d(self):
         x = np.random.rand(2, 3, 4, 5, 6).astype("float32")
-        expected_shape = (2, 3, 2, 2, 2)
+        expected_shape = [2, 3, 2, 2, 2]
         self.assertEqual(adaptive_max_pool3d(pd.to_tensor(x), [2, 2, 2]).shape, expected_shape)
 
     def test_rnncell(self):
@@ -259,8 +262,8 @@ class TestPaddleNN(CustomTestCase):
         bias_hh = pd.to_tensor(np.random.rand(3), dtype="float32")
         cell = rnncell(weight_ih, weight_hh, bias_ih, bias_hh, act="relu")
         output, new_h = cell.forward(input, h)
-        self.assertEqual(output.shape, (2, 3))
-        self.assertEqual(new_h.shape, (2, 3))
+        self.assertEqual(output.shape, [2, 3])
+        self.assertEqual(new_h.shape, [2, 3])
 
     def test_lstmcell(self):
         input = pd.to_tensor(np.random.rand(2, 3), dtype="float32")
@@ -285,15 +288,15 @@ class TestPaddleNN(CustomTestCase):
         bias_hh = pd.to_tensor(np.random.rand(3), dtype="float32")
         cell = grucell(weight_ih, weight_hh, bias_ih, bias_hh)
         output, new_h = cell.forward(input, h)
-        self.assertEqual(output.shape, (2, 3))
-        self.assertEqual(new_h.shape, (2, 3))
+        self.assertEqual(output.shape, [2, 3])
+        self.assertEqual(new_h.shape, [2, 3])
 
     def test_split_states(self):
         states = pd.to_tensor(np.random.rand(4, 2, 3), dtype="float32")
         split = split_states(states, bidirectional=True, state_components=1)
         self.assertEqual(len(split), 2)
         self.assertEqual(len(split[0]), 2)
-        self.assertEqual(split[0][0].shape, (2, 3))
+        self.assertEqual(split[0][0].shape, [2, 3])
 
     def test_concat_states(self):
         states = [pd.to_tensor(np.random.rand(2, 3), dtype="float32") for _ in range(4)]
@@ -306,7 +309,7 @@ class TestPaddleNN(CustomTestCase):
         beta = pd.to_tensor(np.zeros(4), dtype="float32")
         norm = layernorm(normalized_shape=[4], gamma=gamma, beta=beta, eps=1e-5, input_shape=[2, 3, 4])
         output = norm(input)
-        self.assertEqual(output.shape, (2, 3, 4))
+        self.assertEqual(output.shape, [2, 3, 4])
 
     def test_multiheadattention(self):
         q = pd.to_tensor(np.random.rand(2, 3, 4), dtype="float32")
@@ -322,7 +325,7 @@ class TestPaddleNN(CustomTestCase):
         out_bias = pd.to_tensor(np.zeros(4), dtype="float32")
         mha = multiheadattention(embed_dim=4, num_heads=2, dropout=0.1, batch_first=True, need_weights=False, q_weight=q_weight, k_weight=k_weight, v_weight=v_weight, out_weight=out_weight, q_bias=q_bias, k_bias=k_bias, v_bias=v_bias, out_bias=out_bias, train=True)
         output, _ = mha(q, k, v, None, None)
-        self.assertEqual(output.shape, (2, 3, 4))
+        self.assertEqual(output.shape, [2, 3, 4])
 
     def test_prelu(self):
         x = np.random.rand(2, 3, 4).astype("float32")
@@ -355,7 +358,7 @@ class TestPaddleNN(CustomTestCase):
     def test_unfold(self):
         x = np.random.rand(2, 3, 4, 4).astype("float32")
         # Expected shape calculation
-        expected_shape = (2, 12, 9)
+        expected_shape = [2, 12, 9]
         self.assertEqual(unfold(pd.to_tensor(x), 2).shape, expected_shape)
 
 
