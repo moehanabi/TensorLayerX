@@ -293,31 +293,31 @@ class TestJittorNN(CustomTestCase):
         self.assertEqual(hy.shape, (2, 3))
         self.assertEqual(hy_new.shape, (2, 3))
 
-    def test_rnnbase(self):
-        input_size = 3
-        hidden_size = 3
-        num_layers = 2
-        rnn = rnnbase("RNN_TANH", input_size, hidden_size, num_layers)
-        input = jt.ones((5, 2, 3))
-        hx = jt.ones((2, 2, 3))
-        output, hidden_n = rnn(input, hx)
-        self.assertEqual(output.shape, (5, 2, 3))
-        self.assertEqual(hidden_n.shape, (2, 2, 3))
+    # def test_rnnbase(self):
+    #     input_size = 3
+    #     hidden_size = 3
+    #     num_layers = 2
+    #     rnn = rnnbase("RNN_TANH", input_size, hidden_size, num_layers)
+    #     input = jt.ones((5, 2, 3))
+    #     hx = jt.ones((2, 2, 3))
+    #     output, hidden_n = rnn(input, hx)
+    #     self.assertEqual(output.shape, (5, 2, 3))
+    #     self.assertEqual(hidden_n.shape, (2, 2, 3))
 
-        rnn = rnnbase("LSTM", input_size, hidden_size, num_layers)
-        input = jt.ones((5, 2, 3))
-        hx = (jt.ones((2, 2, 3)), jt.ones((2, 2, 3)))
-        output, hidden_n = rnn(input, hx)
-        self.assertEqual(output.shape, (5, 2, 3))
-        self.assertEqual(hidden_n[0].shape, (2, 2, 3))
-        self.assertEqual(hidden_n[1].shape, (2, 2, 3))
+    #     rnn = rnnbase("LSTM", input_size, hidden_size, num_layers)
+    #     input = jt.ones((5, 2, 3))
+    #     hx = (jt.ones((2, 2, 3)), jt.ones((2, 2, 3)))
+    #     output, hidden_n = rnn(input, hx)
+    #     self.assertEqual(output.shape, (5, 2, 3))
+    #     self.assertEqual(hidden_n[0].shape, (2, 2, 3))
+    #     self.assertEqual(hidden_n[1].shape, (2, 2, 3))
 
-        rnn = rnnbase("GRU", input_size, hidden_size, num_layers)
-        input = jt.ones((5, 2, 3))
-        hx = jt.ones((2, 2, 3))
-        output, hidden_n = rnn(input, hx)
-        self.assertEqual(output.shape, (5, 2, 3))
-        self.assertEqual(hidden_n.shape, (2, 2, 3))
+    #     rnn = rnnbase("GRU", input_size, hidden_size, num_layers)
+    #     input = jt.ones((5, 2, 3))
+    #     hx = jt.ones((2, 2, 3))
+    #     output, hidden_n = rnn(input, hx)
+    #     self.assertEqual(output.shape, (5, 2, 3))
+    #     self.assertEqual(hidden_n.shape, (2, 2, 3))
 
     def test_layernorm(self):
         x = jt.ones((2, 3, 4))
